@@ -10,7 +10,7 @@ Write-LogMessage -user $request.headers.'x-ms-client-principal' -API $APINAME -m
 
 # Clear Cache
 if ($request.Query.ClearCache -eq 'true') {
-    Remove-CIPPCache
+    Remove-CIPPCache -tenantsOnly $request.query.TenantsOnly
     $GraphRequest = [pscustomobject]@{'Results' = 'Successfully completed request.' }
     Push-OutputBinding -Name Response -Value ([HttpResponseContext]@{
             StatusCode = [HttpStatusCode]::OK
@@ -34,10 +34,10 @@ try {
                     GraphErrorCount   = 0
                 }) | Out-Null
 
-            if (($Tenants | Measure-Object).Count -gt 1) {
+            if (($Tenants).length -gt 1) {
                 $TenantList.AddRange($Tenants) | Out-Null
             }
-            else {
+            elseif ($Tenants) {
                 $TenantList.Add($Tenants) | Out-Null
             }
             $body = $TenantList

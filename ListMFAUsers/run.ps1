@@ -26,12 +26,12 @@ if ($Request.query.TenantFilter -ne 'AllTenants') {
             if (($policy.grantControls.builtincontrols -eq 'mfa') -or ($policy.grantControls.customAuthenticationFactors -eq 'RequireDuoMfa')) {
                 if ($Policy.conditions.applications.includeApplications -ne 'All') {
                     Write-Host $Policy.conditions.applications.includeApplications
-                    $CAState.Add('Specific Applications') | Out-Null
+                    $CAState.Add("Specific Applications - $($policy.state)") | Out-Null
                     $ExcludeSpecific = $Policy.conditions.users.excludeUsers
                     continue
                 }
                 if ($Policy.conditions.users.includeUsers -eq 'All') {
-                    $CAState.Add('All Users') | Out-Null
+                    $CAState.Add("All Users - $($policy.state)") | Out-Null
                     $ExcludeAllUsers = $Policy.conditions.users.excludeUsers
                     continue
                 }
@@ -76,6 +76,7 @@ if ($Request.query.TenantFilter -ne 'AllTenants') {
             UPN             = $_.UserPrincipalName
             AccountEnabled  = $AccountState
             PerUser         = $PerUser
+            isLicensed      = $_.isLicensed
             MFARegistration = $MFARegUser
             CoveredByCA     = ($UserCAState -join ', ')
             CoveredBySD     = $SecureDefaultsState
